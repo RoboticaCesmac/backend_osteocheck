@@ -6,15 +6,19 @@ import { PatientsController } from "./patients.controller";
 import { PatientsService } from "./patients.service";
 
 export function createPatientsController() {
+  const patientsService = createPatientsService();
+  return new PatientsController(patientsService);
+};
+
+export function createPatientsService() {
   const professionalService = createProfessionalService();
   const appDataSource = AppDataSource;
   const patientsRepository = AppDataSource.getRepository(Patient);
   const professionalPatientsRepository = AppDataSource.getRepository(ProfessionalPatients);
-  const patientsService = new PatientsService(
+  return new PatientsService(
     patientsRepository,
     professionalPatientsRepository,
     appDataSource,
     professionalService
   );
-  return new PatientsController(patientsService);
 }

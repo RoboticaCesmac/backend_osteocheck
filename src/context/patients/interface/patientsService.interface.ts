@@ -3,5 +3,6 @@ import { CreatePatientDTO } from "../dto/createPatient.dto";
 import { Patient } from "../entity/patients.entity";
 
 export interface IPatientsService {
-  create: (createPatientDTO: CreatePatientDTO) => Promise<ServiceResponse<Patient>>
+  create: (createPatientDTO: CreatePatientDTO) => Promise<ServiceResponse<Patient>>;
+  findById: (patientId: number) => Promise<ServiceResponse<Patient | null>>
 }

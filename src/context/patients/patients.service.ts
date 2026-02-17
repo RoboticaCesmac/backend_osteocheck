@@ -20,6 +20,18 @@ export class PatientsService implements IPatientsService {
     this.professionalService = professionalService;
   }
 
+  findById = async (patientId: number): Promise<ServiceResponse<Patient | null>> => {
+    const patient = await this.patientsRepository.findOne({
+      where: {
+        id: patientId,
+      },
+    });
+    return serviceResponse({
+      data: patient,
+      statusCode: patient ? 200 : 404,
+    });
+  }
+
   create = async (createPatientDTO: CreatePatientDTO): Promise<ServiceResponse<Patient>> => {
     await this.professionalService.findById(createPatientDTO.professionalId);
     let patient = await this.patientsRepository.findOne({
