@@ -13,6 +13,7 @@ import { ResponseStatus } from '../enum/responseStatus.enum';
 import { Questionnaire } from './questionnaire.entity';
 import { QuestionResponseAnswer } from './questionnaireResponseAnswer.entity';
 import { QuestionnaireResult } from './questionnaireResult.entity';
+import { Patient } from '../../patients/entity/patients.entity';
 
 @Entity('questionnaireResponses')
 export class QuestionnaireResponse {
@@ -40,7 +41,7 @@ export class QuestionnaireResponse {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  
+
   // Relations
   @ManyToOne(() => Questionnaire, (questionnaire) => questionnaire.responses, {
     onDelete: 'CASCADE',
@@ -48,8 +49,14 @@ export class QuestionnaireResponse {
   @JoinColumn({ name: 'questionnaireId' })
   questionnaire!: Questionnaire;
 
+  @ManyToOne(() => Patient, (patient) => patient.questionnaireResponses, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'patientId' })
+  patient!: Patient;
+
   @OneToOne(() => QuestionnaireResult, (result) => result)
-  @JoinColumn({ name: 'questionnaireResultId'})
+  @JoinColumn({ name: 'questionnaireResultId' })
   result!: QuestionnaireResult;
 
   @OneToMany(

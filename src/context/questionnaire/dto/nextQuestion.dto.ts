@@ -1,5 +1,7 @@
+import { QuestionnaireType } from "../enum/questionnaireType.enum";
+
 export type NextQuestionDTO = {
-  questionnaireId: number;
+  questionnaireType: QuestionnaireType;
   professionalId: number;
   patientId: number;
   questionOptionsIds?: number[];

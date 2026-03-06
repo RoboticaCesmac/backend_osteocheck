@@ -7,6 +7,7 @@ import {
 } from "typeorm";
 import { PatientsGender } from "../enum/patientsGender.enum";
 import { ProfessionalPatients } from "../../professionalPatients/entity/professionalPatients.entity";
+import { QuestionnaireResponse } from "../../questionnaire/entity/questionnaireResponse.entity";
 
 @Entity({
   name: "patients",
@@ -32,6 +33,12 @@ export class Patient {
     (pp) => pp.patient
   )
   professionalRelations!: ProfessionalPatients[];
+
+  @OneToMany(
+    () => QuestionnaireResponse,
+    (qr) => qr.patient
+  )
+  questionnaireResponses!: QuestionnaireResponse[];
 
   @Column()
   createdAt!: Date;

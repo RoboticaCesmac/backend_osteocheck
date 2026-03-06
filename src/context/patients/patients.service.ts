@@ -22,6 +22,9 @@ export class PatientsService implements IPatientsService {
 
   findById = async (patientId: number): Promise<ServiceResponse<Patient | null>> => {
     const patient = await this.patientsRepository.findOne({
+      relations: {
+        questionnaireResponses: true,
+      },
       where: {
         id: patientId,
       },

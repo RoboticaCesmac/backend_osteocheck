@@ -3,6 +3,7 @@ import { HttpResponse } from "../../utils/httpResponses";
 import { serviceResponse, ServiceResponse } from "../../utils/serviceResponse";
 import { IPatientsService } from "../patients/interface/patientsService.interface";
 import { NextQuestionDTO } from "./dto/nextQuestion.dto";
+import { QuestionnaireProgressDTO, QuestionnaireProgressResponse } from "./dto/questionnaireProgress.dto";
 import { Question } from "./entity/question.entity";
 import { IQuestionnaireService } from "./interface/questionnaireService.interface";
 import { Questionnaire } from "./entity/questionnaire.entity";
@@ -14,6 +15,7 @@ import { QuestionResponseAnswer } from "./entity/questionnaireResponseAnswer.ent
 import { IQuestionnaireRules } from "./interface/questionnaireRules.interface";
 import { QuestionnaireResultType } from "./enum/questionnaireResultType.enum";
 import { QuestionnaireResult } from "./entity/questionnaireResult.entity";
+import { QuestionnaireType } from "./enum/questionnaireType.enum";
 
 export class QuestionnaireService implements IQuestionnaireService {
   private patientsService: IPatientsService;
@@ -52,7 +54,7 @@ export class QuestionnaireService implements IQuestionnaireService {
         group: {
           order: 0,
           questionnaire: {
-            id: nextQuestionDTO.questionnaireId,
+            type: nextQuestionDTO.questionnaireType,
           },
         },
         order: 0,
@@ -97,6 +99,10 @@ export class QuestionnaireService implements IQuestionnaireService {
     }
     const currentQuestionGroup = currentQuestion.group;
     const nextQuestion = await this.questionRepository.findOne({
+      relations: {
+        options: true,
+        group: true,
+      },
       where: [
         {
           order: currentQuestion.order + 1,
@@ -112,7 +118,6 @@ export class QuestionnaireService implements IQuestionnaireService {
         },
       ],
     });
-    console.log(nextQuestion);
     await this.handleQuestionnaireResponseSession(nextQuestionDTO);
     return serviceResponse(HttpResponse.success({
       data: nextQuestion,
@@ -131,9 +136,12 @@ export class QuestionnaireService implements IQuestionnaireService {
   private handleQuestionnaireResponseSession = async (nextQuestionDTO: NextQuestionDTO, isFinalQuestion?: boolean, questionnaireResultType?: QuestionnaireResultType) => {
     let questionnaireResponseId: number;
     const questionnaireResponse = await this.questionnaireResponseRepository.findOne({
+      relations: {
+        questionnaire: true,
+      },
       where: {
         questionnaire: {
-          id: nextQuestionDTO.questionnaireId,
+          type: nextQuestionDTO.questionnaireType,
         },
         patientId: nextQuestionDTO.patientId,
         professionalId: nextQuestionDTO.professionalId,
@@ -154,8 +162,14 @@ export class QuestionnaireService implements IQuestionnaireService {
     }
 
     if (!questionnaireResponse) {
+      const questionnaire = await this.questionnaireRepository.findOne({
+        where: {
+          type: nextQuestionDTO.questionnaireType,
+        },
+      });
+
       const newQuestionnaireResponse = new QuestionnaireResponse();
-      newQuestionnaireResponse.questionnaireId = nextQuestionDTO.questionnaireId;
+      newQuestionnaireResponse.questionnaireId = questionnaire?.id ?? 1;
       newQuestionnaireResponse.professionalId = nextQuestionDTO.professionalId;
       newQuestionnaireResponse.patientId = nextQuestionDTO.patientId;
       newQuestionnaireResponse.status = isFinalQuestion ? ResponseStatus.COMPLETED : ResponseStatus.IN_PROGRESS;
@@ -167,6 +181,18 @@ export class QuestionnaireService implements IQuestionnaireService {
   }
 
   private answerQuestion = async (nextQuestionDTOWithQuestionnaireResponse: NextQuestionDTO & { questionnaireResponseId: number }) => {
+    if (nextQuestionDTOWithQuestionnaireResponse.questionId) {
+      const existingAnswers = await this.dataSource.getRepository(QuestionResponseAnswer).find({
+        where: {
+          responseId: nextQuestionDTOWithQuestionnaireResponse.questionnaireResponseId,
+          questionId: nextQuestionDTOWithQuestionnaireResponse.questionId,
+        }
+      });
+      if (existingAnswers.length > 0) {
+        return;
+      }
+    }
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.startTransaction();
     try {
@@ -210,7 +236,7 @@ export class QuestionnaireService implements IQuestionnaireService {
         message: 'O paciente especificado não existe.',
       });
     }
-    const questionnaire = await this.findQuestionnaireById(nextQuestionDTO.questionnaireId);
+    const questionnaire = await this.findQuestionnaireByType(nextQuestionDTO.questionnaireType);
     if (!questionnaire.data) {
       throw HttpResponse.notFound({
         message: 'O questionário especificado não existe.',
@@ -230,18 +256,11 @@ export class QuestionnaireService implements IQuestionnaireService {
         }
       }
     });
-    // const isTerminalOption = currentQuestion?.isTerminal;
     const optionWithNextQuestionId = currentQuestionAndOption?.options.find(o => o.nextQuestionId !== null);
     if (optionWithNextQuestionId) {
       return await this.handleOptionWithNextQuestionId(optionWithNextQuestionId.nextQuestionId!, nextQuestionDTO);
     }
-    // if (isTerminalOption) {
-    //   await this.handleQuestionnaireResponseSession(nextQuestionDTO, true) as any;
-    //   return serviceResponse(HttpResponse.success({
-    //     data: null,
-    //     message: 'Questionário finalizado!',
-    //   }));
-    // }
+
     return await this.handleNextQuestionInOrder(nextQuestionDTO);
   }
 
@@ -255,5 +274,73 @@ export class QuestionnaireService implements IQuestionnaireService {
       data: questionnaire,
       statusCode: questionnaire ? 200 : 404,
     });
+  }
+
+  findQuestionnaireByType = async (questionnaireType: QuestionnaireType): Promise<ServiceResponse<Questionnaire | null>> => {
+    const questionnaire = await this.questionnaireRepository.findOne({
+      where: {
+        type: questionnaireType,
+      },
+    });
+    return serviceResponse({
+      data: questionnaire,
+      statusCode: questionnaire ? 200 : 404,
+    });
+  }
+
+  getQuestionnaireProgress = async (questionnaireProgressDTO: QuestionnaireProgressDTO): Promise<ServiceResponse<QuestionnaireProgressResponse>> => {
+    const questionnaireResponse = await this.questionnaireResponseRepository.findOne({
+      where: {
+        questionnaire: {
+          type: questionnaireProgressDTO.questionnaireType,
+        },
+        patientId: questionnaireProgressDTO.patientId,
+        professionalId: questionnaireProgressDTO.professionalId,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+
+    if (!questionnaireResponse || questionnaireResponse.status === ResponseStatus.COMPLETED) {
+      return serviceResponse(HttpResponse.success({
+        data: {
+          isBeggining: true,
+        }
+      }));
+    }
+
+    const lastAnswer = await this.dataSource.getRepository(QuestionResponseAnswer).findOne({
+      where: { responseId: questionnaireResponse.id },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!lastAnswer) {
+      return serviceResponse(HttpResponse.success({
+        data: {
+          isBeggining: true,
+        }
+      }));
+    }
+
+    const lastQuestionAnswers = await this.dataSource.getRepository(QuestionResponseAnswer).find({
+      where: {
+        responseId: questionnaireResponse.id,
+        questionId: lastAnswer.questionId,
+      }
+    });
+
+    const questionOptionsIds = lastQuestionAnswers
+      .filter(a => a.optionId !== null)
+      .map(a => a.optionId as number);
+
+    return serviceResponse(HttpResponse.success({
+      data: {
+        isBeggining: false,
+        questionnaireId: questionnaireResponse.questionnaireId,
+        questionId: lastAnswer.questionId,
+        questionOptionsIds,
+      }
+    }));
   }
 }
