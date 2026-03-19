@@ -448,6 +448,12 @@ export class QuestionnaireService implements IQuestionnaireService {
         doc.fontSize(12).font('Helvetica').text(cleanText);
       }
 
+      doc.moveDown(2);
+      doc.fontSize(14).font('Helvetica-Bold').text('Considerações Finais', { underline: true }).moveDown(1);
+      doc.fontSize(12).font('Helvetica').text('Disclaimer: O aplicativo é uma ferramenta de apoio e NÃO substitui o julgamento clínico. O diagnóstico e tratamento finais são de responsabilidade do profissional de saúde.');
+      doc.moveDown(0.5);
+      doc.text('Atualizações: O conteúdo será revisado periodicamente para incorporar novas diretrizes e consensos.');
+
       doc.end();
     });
 
