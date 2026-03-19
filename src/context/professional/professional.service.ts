@@ -18,6 +18,7 @@ import { IEmailService } from '../../commons/email/emailService.interface';
 import { EmailType } from '../../commons/email/enum/emailType.enum';
 import { QuestionnaireResponse } from '../questionnaire/entity/questionnaireResponse.entity';
 import { PaginationOptions, PaginationResult, paginate } from '../../utils/pagination';
+import { ResponseStatus } from '../questionnaire/enum/responseStatus.enum';
 
 export class ProfessionalService implements IProfessionalService {
   private professionalRepository: Repository<Professional>;
@@ -138,6 +139,7 @@ export class ProfessionalService implements IProfessionalService {
         {
           where: {
             professionalId,
+            status: ResponseStatus.COMPLETED,
           },
           relations: {
             patient: true,
