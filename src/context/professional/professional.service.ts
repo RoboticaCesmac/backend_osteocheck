@@ -15,10 +15,11 @@ import { Patient } from '../patients/entity/patients.entity';
 import { ConfirmForgotPasswordTokenDTO } from './dto/confirmForgotPasswordToken.dto';
 import { ChangePasswordDTO } from './dto/changePassword.dto';
 import { IEmailService } from '../../commons/email/emailService.interface';
-import { EmailType } from '../../commons/email/enum/emailType.enum';
 import { QuestionnaireResponse } from '../questionnaire/entity/questionnaireResponse.entity';
 import { PaginationOptions, PaginationResult, paginate } from '../../utils/pagination';
 import { ResponseStatus } from '../questionnaire/enum/responseStatus.enum';
+import { signupEmailConst } from '../../const/email/signupEmail.const';
+import { forgotPasswordEmailConst } from '../../const/email/forgotPasswordEmail.const';
 
 export class ProfessionalService implements IProfessionalService {
   private professionalRepository: Repository<Professional>;
@@ -80,6 +81,13 @@ export class ProfessionalService implements IProfessionalService {
         forgotPasswordToken,
       }
     );
+
+    await this.emailService.sendEmail({
+      emailAddress: [professional.email],
+      subject: forgotPasswordEmailConst.subject,
+      text: `${forgotPasswordEmailConst.text} ${forgotPasswordToken}`,
+    });
+
     return serviceResponse(HttpResponse.success({
       data: { token: forgotPasswordToken },
       message: 'Um token de confirmação foi enviado para o seu email',
@@ -323,11 +331,9 @@ export class ProfessionalService implements IProfessionalService {
       });
 
       this.emailService.sendEmail({
-        emailAddress: signupDTO.email,
-        emailType: EmailType.LoginConfirmation,
-        payload: {
-          code: accountConfirmationToken,
-        }
+        emailAddress: [signupDTO.email],
+        subject: signupEmailConst.subject,
+        text: `${signupEmailConst.text} ${accountConfirmationToken}`,
       });
 
       return serviceResponse(

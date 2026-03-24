@@ -63,7 +63,7 @@ export class JawAssessmentQuestionnaireRules implements IQuestionnaireRules {
   }
 
   private terminalOptions = (question: Question, questionOptions: QuestionOption[]): QuestionnaireRuleReturn | null => {
-    if (question.group.order === 0  && question.order === 0 && questionOptions.find(qo => qo.isTerminal === true && qo.order === 1)) {
+    if (question.group.order === 0 && question.order === 0 && questionOptions.find(qo => qo.isTerminal === true && qo.order === 1)) {
       return { isTerminal: true, questionnaireResultType: QuestionnaireResultType.OnmRmInsignificantRisk };
     }
     if (question.group.order === 3 && question.order === 0 && questionOptions.find(qo => qo.order === 0)) {
@@ -78,7 +78,7 @@ export class JawAssessmentQuestionnaireRules implements IQuestionnaireRules {
         finalResult.questionnaireResultType === QuestionnaireResultType.StageTwo;
       }
       return finalResult;
-    } 
+    }
     return null;
   }
 

@@ -3,6 +3,8 @@ import cors from 'cors';
 import 'reflect-metadata'
 import router from './routes';
 import { AppDataSource } from './database/dbConnection';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 AppDataSource.initialize();

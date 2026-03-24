@@ -150,13 +150,15 @@ export class QuestionnaireService implements IQuestionnaireService {
         status: ResponseStatus.IN_PROGRESS,
       }
     });
+
+    let questionnaireResultId: number | null = null;
+    if (questionnaireResultType) {
+      const questionnaireResult = await this.findQuestionnaireResultByType(questionnaireResultType);
+      questionnaireResultId = questionnaireResult?.id ?? null;
+    }
+
     questionnaireResponseId = questionnaireResponse?.id ?? 0;
     if (questionnaireResponse && isFinalQuestion) {
-      let questionnaireResultId: number | null = null;
-      if (questionnaireResultType) {
-        const questionnaireResult = await this.findQuestionnaireResultByType(questionnaireResultType);
-        questionnaireResultId = questionnaireResult?.id ?? null;
-      }
       questionnaireResponse.completedAt = dayjs().toDate();
       questionnaireResponse.status = ResponseStatus.COMPLETED;
       questionnaireResponse.result = { id: questionnaireResultId } as Relation<QuestionnaireResult>;
@@ -176,6 +178,7 @@ export class QuestionnaireService implements IQuestionnaireService {
       newQuestionnaireResponse.patientId = nextQuestionDTO.patientId;
       newQuestionnaireResponse.status = isFinalQuestion ? ResponseStatus.COMPLETED : ResponseStatus.IN_PROGRESS;
       newQuestionnaireResponse.completedAt = isFinalQuestion ? dayjs().toDate() : null;
+      newQuestionnaireResponse.result = { id: questionnaireResultId } as Relation<QuestionnaireResult>;
       const saveQuestionnaireResponseAnswer = await this.questionnaireResponseRepository.save(newQuestionnaireResponse);
       questionnaireResponseId = saveQuestionnaireResponseAnswer.id;
     }
@@ -224,6 +227,7 @@ export class QuestionnaireService implements IQuestionnaireService {
       const questionnaireSpecificRule = await this.questionnaireRules.orchestrateQuestionRule(nextQuestionDTO.questionId, nextQuestionDTO.questionOptionsIds)
       if (questionnaireSpecificRule) {
         if (questionnaireSpecificRule.isTerminal) {
+          console.log(questionnaireSpecificRule);
           await this.handleQuestionnaireResponseSession(nextQuestionDTO, true, questionnaireSpecificRule.questionnaireResultType);
           return serviceResponse(HttpResponse.success({
             data: null,

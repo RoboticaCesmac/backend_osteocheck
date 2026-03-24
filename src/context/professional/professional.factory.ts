@@ -5,7 +5,7 @@ import { Professional } from "./entity/professional.entity";
 import { Encrypt } from "../../commons/encrypt/encrypt";
 import { JWTService } from "../../commons/jwt/jwt";
 import { QuestionnaireResponse } from "../questionnaire/entity/questionnaireResponse.entity";
-import { MockEmailService } from "../../commons/email/mockEmailService";
+import gmailEmailService from "../../commons/email/gmailEmail.service";
 
 export function createProfessionalController() {
   const professionalService = createProfessionalService();
@@ -15,8 +15,7 @@ export function createProfessionalController() {
 export function createProfessionalService() {
   const jwtService = new JWTService();
   const encrypt = new Encrypt();
-  const mockEmailService = new MockEmailService();
   const userRepository = AppDataSource.getRepository(Professional);
   const questionnaireResponseRepository = AppDataSource.getRepository(QuestionnaireResponse);
-  return new ProfessionalService(userRepository, encrypt, jwtService, mockEmailService, questionnaireResponseRepository);
+  return new ProfessionalService(userRepository, encrypt, jwtService, gmailEmailService, questionnaireResponseRepository);
 }
