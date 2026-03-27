@@ -21,6 +21,16 @@ export class ProfessionalController {
     }
   }
 
+  deleteProfessional = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const professionalId = req.professional.id;
+      const { statusCode, ...response } = await this.professionalService.deleteProfessional(Number(professionalId));
+      return res.status(statusCode).send(response);
+    } catch (err: any) {
+      return res.status(err.statusCode || 500).send({ error: err.message });
+    }
+  }
+
   confirmForgotPasswordToken = async (req: Request, res: Response): Promise<Response> => {
     try {
       const { email, forgotPasswordToken } = req.body;

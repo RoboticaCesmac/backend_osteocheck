@@ -94,8 +94,22 @@ export class ProfessionalService implements IProfessionalService {
     }));
   }
 
+  deleteProfessional = async (id: number): Promise<ServiceResponse<null>> => {
+    const professional = await this.getProfile(id);
+    if (!professional.data) {
+      throw HttpResponse.badRequest({
+        message: 'Profissional não encontrado',
+      });
+    }
+    await this.professionalRepository.delete(professional.data.id);
+    return serviceResponse(HttpResponse.success({
+      message: 'Profissional deletado com sucesso!',
+    }));
+  }
+
   confirmForgotPasswordToken = async (confirmForgotPasswordTokenDTO: ConfirmForgotPasswordTokenDTO): Promise<ServiceResponse<null>> => {
     const professional = await this.findProfessionalByEmail(confirmForgotPasswordTokenDTO.email);
+    console.log(professional);
     if (!professional) {
       throw HttpResponse.badRequest({
         message: 'Esse usuário não existe!',
@@ -195,6 +209,7 @@ export class ProfessionalService implements IProfessionalService {
         message: 'Esse usuário não existe!',
       });
     }
+
 
     if (professional.accountConfirmationToken !== confirmSignupTokenDTO.signupToken) {
       throw HttpResponse.badRequest({
@@ -303,14 +318,21 @@ export class ProfessionalService implements IProfessionalService {
 
   signUp = async (signupDTO: SignupDTO): Promise<ServiceResponse<Professional>> => {
     try {
+      signupDTO.email = signupDTO.email.toLowerCase();
       const userWithGivenEmail = await this.professionalRepository.findOne({
         where: {
           email: signupDTO.email,
         },
       });
-      if (userWithGivenEmail) {
+      if (userWithGivenEmail && userWithGivenEmail.hasConfirmedAccount) {
         throw HttpResponse.badRequest({
           message: 'Já existe um usuário com e-mail',
+        });
+      }
+
+      if (userWithGivenEmail && !userWithGivenEmail.hasConfirmedAccount) {
+        await this.professionalRepository.delete({
+          id: userWithGivenEmail.id,
         });
       }
 

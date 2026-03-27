@@ -8,6 +8,12 @@ const professionalController = createProfessionalController();
 
 const router = Router();
 
+router.delete(
+  "/professional",
+  authMiddleware(),
+  professionalController.deleteProfessional
+)
+
 router.put(
   "/professional/change/password",
   validateRequest(professionalRequest.changePassword),
