@@ -1,0 +1,35 @@
+import { Repository } from "typeorm";
+import { ServiceResponse } from "../../utils/serviceResponse";
+import { IPatientsService } from "../patients/interface/patientsService.interface";
+import { NextQuestionDTO } from "./dto/nextQuestion.dto";
+import { QuestionnaireProgressDTO, QuestionnaireProgressResponse } from "./dto/questionnaireProgress.dto";
+import { Question } from "./entity/question.entity";
+import { IQuestionnaireService } from "./interface/questionnaireService.interface";
+import { Questionnaire } from "./entity/questionnaire.entity";
+import { QuestionnaireResponse } from "./entity/questionnaireResponse.entity";
+import { DataSource } from "typeorm";
+import { IQuestionnaireRules } from "./interface/questionnaireRules.interface";
+import { QuestionnaireResult } from "./entity/questionnaireResult.entity";
+import { QuestionnaireType } from "./enum/questionnaireType.enum";
+import { GeneratePdfDTO } from "./dto/generatePdf.dto";
+export declare class QuestionnaireService implements IQuestionnaireService {
+    private patientsService;
+    private questionnaireRepository;
+    private questionRepository;
+    private questionnaireResponseRepository;
+    private dataSource;
+    private questionnaireRules;
+    private questionnaireResultRepository;
+    constructor(patientsService: IPatientsService, questionnaireRepository: Repository<Questionnaire>, questionRepository: Repository<Question>, questionnaireResponseRepository: Repository<QuestionnaireResponse>, dataSource: DataSource, questionnaireRules: IQuestionnaireRules, questionnaireResultRepository: Repository<QuestionnaireResult>);
+    private handleFirstQuestion;
+    private handleOptionWithNextQuestionId;
+    private handleNextQuestionInOrder;
+    private findQuestionnaireResultByType;
+    private handleQuestionnaireResponseSession;
+    private answerQuestion;
+    nextQuestion: (nextQuestionDTO: NextQuestionDTO) => Promise<ServiceResponse<Question | null>>;
+    findQuestionnaireById: (questionnaireId: number) => Promise<ServiceResponse<Questionnaire | null>>;
+    findQuestionnaireByType: (questionnaireType: QuestionnaireType) => Promise<ServiceResponse<Questionnaire | null>>;
+    getQuestionnaireProgress: (questionnaireProgressDTO: QuestionnaireProgressDTO) => Promise<ServiceResponse<QuestionnaireProgressResponse>>;
+    generatePdf: (generatePdfDTO: GeneratePdfDTO) => Promise<ServiceResponse<Buffer>>;
+}

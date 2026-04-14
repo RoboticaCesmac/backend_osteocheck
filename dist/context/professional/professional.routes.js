@@ -1,0 +1,24 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const professional_factory_1 = require("./professional.factory");
+const validateRequest_middleware_1 = require("../../middleware/validateRequest.middleware");
+const professional_request_1 = __importDefault(require("./request/professional.request"));
+const authenticate_middleware_1 = require("../../middleware/authenticate.middleware");
+const professionalController = (0, professional_factory_1.createProfessionalController)();
+const router = (0, express_1.Router)();
+router.delete("/professional", (0, authenticate_middleware_1.authMiddleware)(), professionalController.deleteProfessional);
+router.put("/professional/change/password", (0, validateRequest_middleware_1.validateRequest)(professional_request_1.default.changePassword), professionalController.changePassword);
+router.put("/professional/send/forgot-password-token", (0, validateRequest_middleware_1.validateRequest)(professional_request_1.default.sendForgotPasswordToken), professionalController.sendForgotPasswordToken);
+router.put("/professional/confirm/forgot-password-token", (0, validateRequest_middleware_1.validateRequest)(professional_request_1.default.confirmForgotPasswordToken), professionalController.confirmForgotPasswordToken);
+router.post("/professional/signup", (0, validateRequest_middleware_1.validateRequest)(professional_request_1.default.signup), professionalController.signup);
+router.get("/professional/profile", (0, authenticate_middleware_1.authMiddleware)(), professionalController.getProfile);
+router.get("/professional/patients", (0, authenticate_middleware_1.authMiddleware)(), professionalController.getProfessionalPatients);
+router.get("/professional/patients/questionnaire-responses", (0, authenticate_middleware_1.authMiddleware)(), professionalController.getLastQuestionnaireResponses);
+router.post("/professional/confirm-signup-token", (0, validateRequest_middleware_1.validateRequest)(professional_request_1.default.confirmSignupToken), professionalController.confirmSignupToken);
+router.post("/professional/login", (0, validateRequest_middleware_1.validateRequest)(professional_request_1.default.login), professionalController.login);
+router.get("/professional", professionalController.getAll);
+exports.default = router;
