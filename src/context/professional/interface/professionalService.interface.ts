@@ -11,6 +11,7 @@ import { QuestionnaireResponse } from "../../questionnaire/entity/questionnaireR
 import { PaginationOptions, PaginationResult } from "../../../utils/pagination";
 
 export interface IProfessionalService {
+  toggleDeactivate: (id: number) => Promise<ServiceResponse<Professional>>;
   deleteProfessional: (id: number) => Promise<ServiceResponse<null>>;
   signUp: (signupDTO: SignupDTO) => Promise<ServiceResponse<Professional>>;
   changePassword: (changePasswordDTO: ChangePasswordDTO) => Promise<ServiceResponse<null>>;

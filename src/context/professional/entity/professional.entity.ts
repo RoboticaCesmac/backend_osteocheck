@@ -5,8 +5,10 @@ import {
   DeleteDateColumn,
   ManyToMany,
   JoinTable,
+  OneToMany,
 } from "typeorm";
 import { Patient } from "../../patients/entity/patients.entity";
+import { QuestionnaireResponse } from "../../questionnaire/entity/questionnaireResponse.entity";
 
 @Entity({
   name: "professionals",
@@ -49,4 +51,15 @@ export class Professional {
 
   @DeleteDateColumn()
   deletedAt!: Date;
+
+  @Column()
+  deactivated!: boolean;
+
+  // relations
+
+  @OneToMany(
+    () => QuestionnaireResponse,
+    (qr) => qr.professional,
+  )
+  questionnaireResponses!: QuestionnaireResponse[];
 }

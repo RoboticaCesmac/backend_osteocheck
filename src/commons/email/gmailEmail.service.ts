@@ -1,40 +1,37 @@
-import { IEmailService } from "./emailService.interface";
-import { EmailPayload } from "./type/emailPayload.type";
-import nodemailer from 'nodemailer';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 
+const resend_1 = require("resend");
 
-class GmailEmailService implements IEmailService {
-    private gmailUser: string;
-    private gmailAppPassword: string;
-    private transporter: nodemailer.Transporter;
-
+class GmailEmailService {
     constructor() {
-        this.gmailUser = process.env.GMAIL_USER ?? 'emmanuelmedeiros05@gmail.com';
-        this.gmailAppPassword = process.env.GMAIL_APP_PASSWORD ?? '123456';
-        this.transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: this.gmailUser,
-                pass: this.gmailAppPassword,
-            },
-        });
+        this.gmailUser = process.env.GMAIL_USER;
+        this.gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
+
+        this.transporter = new resend_1.Resend(this.gmailAppPassword);
     }
 
-    async sendEmail(emailPayload: EmailPayload): Promise<void> {
-        const emailAddresses = emailPayload.emailAddress.join(', ');
+    async sendEmail(emailPayload) {
+        const emailAddresses = emailPayload.emailAddress; // não precisa join
+
         try {
-            await this.transporter.sendMail({
+            await this.transporter.emails.send({
                 from: `"OsteoCheck" <${this.gmailUser}>`,
                 to: emailAddresses,
                 subject: emailPayload.subject,
                 text: emailPayload.text,
             });
+
             console.log('Email sent successfully');
-        } catch (err: any) {
+        }
+        catch (err) {
             console.error(`Erro ao tentar enviar email: ${err.message}`);
             throw err;
         }
     }
 }
 
-export default new GmailEmailService();
+exports.default = new GmailEmailService();

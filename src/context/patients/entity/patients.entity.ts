@@ -20,7 +20,7 @@ export class Patient {
   name!: string;
 
   @Column()
-  cpf!: string;
+  identifier!: string;
 
   @Column()
   dateOfBirth!: Date;

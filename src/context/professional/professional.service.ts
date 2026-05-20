@@ -46,6 +46,21 @@ export class ProfessionalService implements IProfessionalService {
     this.questionnaireResponseRepository = questionnaireResponseRepository;
   }
 
+  toggleDeactivate = async (id: number): Promise<ServiceResponse<Professional>> => {
+    const professional = await this.getProfile(id);
+    if (!professional.data) {
+      throw HttpResponse.badRequest({
+        message: 'Profissional não encontrado',
+      });
+    }
+
+    await this.professionalRepository.update(id, { deactivated: !professional.data.deactivated });
+    return serviceResponse(HttpResponse.success({
+      data: { ...professional.data, deactivated: !professional.data.deactivated },
+      message: 'Profissional ' + (professional.data.deactivated ? 'ativado' : 'desativado') + ' com sucesso!',
+    }));
+  }
+
   changePassword = async (changePasswordDTO: ChangePasswordDTO): Promise<ServiceResponse<null>> => {
     const professional = await this.findProfessionalByEmail(changePasswordDTO.email);
     if (!professional) {
@@ -109,7 +124,6 @@ export class ProfessionalService implements IProfessionalService {
 
   confirmForgotPasswordToken = async (confirmForgotPasswordTokenDTO: ConfirmForgotPasswordTokenDTO): Promise<ServiceResponse<null>> => {
     const professional = await this.findProfessionalByEmail(confirmForgotPasswordTokenDTO.email);
-    console.log(professional);
     if (!professional) {
       throw HttpResponse.badRequest({
         message: 'Esse usuário não existe!',
@@ -182,7 +196,7 @@ export class ProfessionalService implements IProfessionalService {
   getProfile = async (professionalId: number): Promise<ServiceResponse<Professional>> => {
     const professional = await this.professionalRepository.findOne({
       where: { id: professionalId },
-      select: ['id', 'name', 'email', 'createdAt', 'updatedAt', 'hasConfirmedAccount'],
+      select: ['id', 'name', 'email', 'createdAt', 'updatedAt', 'hasConfirmedAccount', 'deactivated'],
     });
 
     if (!professional) {
@@ -287,6 +301,7 @@ export class ProfessionalService implements IProfessionalService {
           email: ILike(email),
         },
       });
+
       if (!user) {
         throw HttpResponse.badRequest({
           message: 'Não existe usuário com essas credenciais no sistema',

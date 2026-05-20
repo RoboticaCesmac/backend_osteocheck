@@ -15,6 +15,18 @@ router.delete(
 )
 
 router.put(
+  "/professional/:id/deactivate",
+  authMiddleware(),
+  professionalController.deactivate
+)
+
+router.get(
+  "/professional/findById/:id",
+  authMiddleware(),
+  professionalController.findById
+)
+
+router.put(
   "/professional/change/password",
   validateRequest(professionalRequest.changePassword),
   professionalController.changePassword

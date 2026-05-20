@@ -358,6 +358,7 @@ export class QuestionnaireService implements IQuestionnaireService {
     const questionnaireResponse = await this.questionnaireResponseRepository.findOne({
       relations: {
         patient: true,
+        professional: true,
         answers: {
           question: true,
           option: true,
@@ -374,16 +375,15 @@ export class QuestionnaireService implements IQuestionnaireService {
       },
     });
 
+    console.log(questionnaireResponse?.patient);
+
     if (!questionnaireResponse || questionnaireResponse.status !== ResponseStatus.COMPLETED) {
       throw HttpResponse.badRequest({
         message: 'Não é possível visualizar o PDF desse questionário. Ainda não foi finalizado.',
       });
     }
 
-    const professional = await this.dataSource.getRepository(Professional).findOne({
-      where: { id: generatePdfDTO.professionalId }
-    });
-
+    const professional = questionnaireResponse.professional;
     if (!professional) {
       throw HttpResponse.notFound({
         message: 'Profissional não encontrado.',
@@ -409,12 +409,13 @@ export class QuestionnaireService implements IQuestionnaireService {
       doc.fontSize(12).text(`Nome: ${professional.name}`);
       doc.text(`E-mail: ${professional.email}`).moveDown(1);
 
+
       // Patient Info
       doc.fontSize(14).text('Informações do Paciente', { underline: true }).moveDown(0.5);
-      doc.fontSize(12).text(`Nome: ${questionnaireResponse.patient.name}`);
-      doc.text(`CPF: ${questionnaireResponse.patient.cpf}`);
-      doc.text(`Data de Nascimento: ${dayjs(questionnaireResponse.patient.dateOfBirth).format('DD/MM/YYYY')}`);
-      doc.text(`Gênero: ${questionnaireResponse.patient.gender}`).moveDown(1.5);
+      doc.fontSize(12).text(`Nome: ${questionnaireResponse.patient?.name || '--'}`);
+      doc.text(`Identificador: ${questionnaireResponse.patient?.identifier || '--'}`);
+      doc.text(`Data de Nascimento: ${dayjs(questionnaireResponse.patient?.dateOfBirth).format('DD/MM/YYYY') || '--'}`);
+      doc.text(`Gênero: ${questionnaireResponse.patient?.gender || '--'}`).moveDown(1.5);
 
       // QA
       doc.fontSize(14).text('Respostas do Questionário', { underline: true }).moveDown(0.5);
@@ -443,7 +444,7 @@ export class QuestionnaireService implements IQuestionnaireService {
 
       if (questionnaireResponse.result && questionnaireResponse.result.text) {
         doc.moveDown(1);
-        doc.fontSize(14).font('Helvetica-Bold').text('Diagnóstico do Questionário', { underline: true }).moveDown(1);
+        doc.fontSize(14).font('Helvetica-Bold').text('Resultado do Questionário', { underline: true }).moveDown(1);
 
         const cleanText = questionnaireResponse.result.text
           .replace(/\*\*(.*?)\*\*/g, '$1')
@@ -460,7 +461,6 @@ export class QuestionnaireService implements IQuestionnaireService {
       doc.fontSize(14).font('Helvetica-Bold').text('Considerações Finais', { underline: true }).moveDown(1);
       doc.fontSize(12).font('Helvetica').text('Disclaimer: O aplicativo é uma ferramenta de apoio e NÃO substitui o julgamento clínico. O diagnóstico e tratamento finais são de responsabilidade do profissional de saúde.');
       doc.moveDown(0.5);
-      doc.text('Atualizações: O conteúdo será revisado periodicamente para incorporar novas diretrizes e consensos.');
 
       doc.end();
     });

@@ -1,11 +1,11 @@
 import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
-export class CreateTablePatients1770494071100 implements MigrationInterface {
+export class CreateAdminsTable1778206135591 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(
             new Table({
-                name: "patients",
+                name: "admins",
                 columns: [
                     {
                         name: "id",
@@ -15,26 +15,16 @@ export class CreateTablePatients1770494071100 implements MigrationInterface {
                         generationStrategy: "increment",
                     },
                     {
-                        name: "name",
-                        type: "varchar",
-                        isNullable: false,
-                    },
-                    {
-                        name: "identifier",
+                        name: "email",
                         type: "varchar",
                         isNullable: false,
                         isUnique: true,
                     },
                     {
-                        name: "dateOfBirth",
-                        type: "date",
-                        isNullable: false,
-                    },
-                    {
-                        name: "gender",
+                        name: "password",
                         type: "varchar",
                         isNullable: false,
-                    },
+                        },
                     {
                         name: "createdAt",
                         type: "timestamp",
@@ -55,11 +45,11 @@ export class CreateTablePatients1770494071100 implements MigrationInterface {
                 ],
                 indices: [
                     {
-                        name: "IDX_PATIENTS_IDENTIFIER",
-                        columnNames: ["identifier"],
+                        name: "IDX_ADMINS_EMAIL",
+                        columnNames: ["email"],
                     },
                     {
-                        name: "IDX_PATIENTS_DELETED_AT",
+                        name: "IDX_ADMINS_DELETED_AT",
                         columnNames: ["deletedAt"],
                     },
                 ],
@@ -68,7 +58,7 @@ export class CreateTablePatients1770494071100 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable("patients");
+        await queryRunner.dropTable("admins");
     }
 
 }

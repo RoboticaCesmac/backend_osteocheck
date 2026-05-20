@@ -46,6 +46,7 @@ export class InsertResultsOnQuestionnaireResult1771094646510 implements Migratio
         {
             content: `
             - **Paciente com risco insignificante para ONM-RM relacionada a estes medicamentos.** 
+            - **Encaminhar para avaliação odontológica antes de iniciar o uso de medicamentos antirreabsortivos/antiangiogênicos.**
             `,
             type: QuestionnaireResultType.OnmRmInsignificantRisk,
         },

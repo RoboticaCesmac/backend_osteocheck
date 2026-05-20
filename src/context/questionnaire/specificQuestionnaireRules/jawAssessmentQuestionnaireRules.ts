@@ -117,8 +117,6 @@ export class JawAssessmentQuestionnaireRules implements IQuestionnaireRules {
         }
       }
     });
-    console.log('essa é a próxima questão');
-    console.log(nextQuestion);
 
     if (!nextQuestion) {
       throw HttpResponse.notFound({

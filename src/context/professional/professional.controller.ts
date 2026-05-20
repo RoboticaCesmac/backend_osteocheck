@@ -8,6 +8,26 @@ export class ProfessionalController {
     this.professionalService = professionalService;
   }
 
+  findById = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const { id } = req.params;
+      const { statusCode, ...response } = await this.professionalService.findById(Number(id));
+      return res.status(statusCode).send(response);
+    } catch (err: any) {
+      return res.status(err.statusCode || 500).send({ error: err.message });
+    }
+  }
+
+  deactivate = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const { id } = req.params;
+      const { statusCode, ...response } = await this.professionalService.toggleDeactivate(Number(id));
+      return res.status(statusCode).send(response);
+    } catch (err: any) {
+      return res.status(err.statusCode || 500).send({ error: err.message });
+    }
+  }
+
   changePassword = async (req: Request, res: Response): Promise<Response> => {
     try {
       const { email, password } = req.body;
@@ -23,8 +43,10 @@ export class ProfessionalController {
 
   deleteProfessional = async (req: Request, res: Response): Promise<Response> => {
     try {
+      const { id } = req.query;
       const professionalId = req.professional.id;
-      const { statusCode, ...response } = await this.professionalService.deleteProfessional(Number(professionalId));
+      const effectiveProfessionalId = id ?? professionalId;
+      const { statusCode, ...response } = await this.professionalService.deleteProfessional(Number(effectiveProfessionalId));
       return res.status(statusCode).send(response);
     } catch (err: any) {
       return res.status(err.statusCode || 500).send({ error: err.message });
@@ -70,6 +92,7 @@ export class ProfessionalController {
       const { statusCode, ...response } = await this.professionalService.getProfile(professionalId);
       return res.status(statusCode).send(response);
     } catch (err: any) {
+      console.log(err);
       return res.status(err.statusCode || 500).send({ error: err.message });
     }
   }
@@ -82,7 +105,6 @@ export class ProfessionalController {
       if (page && limit) {
         paginationOptions = { page: Number(page), limit: Number(limit) }
       }
-
       const response = await this.professionalService.getLastQuestionnaireResponses(professionalId, paginationOptions);
       return res.status(200).send(response);
     } catch (err: any) {

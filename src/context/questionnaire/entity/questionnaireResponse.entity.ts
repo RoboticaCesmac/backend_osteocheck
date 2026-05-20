@@ -14,6 +14,7 @@ import { Questionnaire } from './questionnaire.entity';
 import { QuestionResponseAnswer } from './questionnaireResponseAnswer.entity';
 import { QuestionnaireResult } from './questionnaireResult.entity';
 import { Patient } from '../../patients/entity/patients.entity';
+import { Professional } from '../../professional/entity/professional.entity';
 
 @Entity('questionnaireResponses')
 export class QuestionnaireResponse {
@@ -54,6 +55,12 @@ export class QuestionnaireResponse {
   })
   @JoinColumn({ name: 'patientId' })
   patient!: Patient;
+
+  @ManyToOne(() => Professional, (professional) => professional.questionnaireResponses, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'professionalId' })
+  professional!: Professional;
 
   @OneToOne(() => QuestionnaireResult, (result) => result)
   @JoinColumn({ name: 'questionnaireResultId' })
