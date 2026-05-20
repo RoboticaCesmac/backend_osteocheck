@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev src/server.ts",
     "build": "tsc --project tsconfig.json",
-    "start": "node dist/server.js",
-    "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js",
-    "migrate": "yarn typeorm migration:run -d ./src/database/dbConnection.ts",
+    "start": "yarn migrate && node dist/server.js",
+
+    "migrate": "node ./node_modules/typeorm/cli.js migration:run -d dist/database/dbConnection.js",
+
     "typeorm:create-migration": "node ./src/prompts/createMigration.js"
   },
   "keywords": [],
