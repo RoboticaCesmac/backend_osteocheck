@@ -28,7 +28,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Patient.prototype, "cpf", void 0);
+], Patient.prototype, "identifier", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Date)

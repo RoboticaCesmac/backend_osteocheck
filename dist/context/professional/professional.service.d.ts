@@ -21,6 +21,7 @@ export declare class ProfessionalService implements IProfessionalService {
     private encrypt;
     private emailService;
     constructor(professionalRepository: Repository<Professional>, encrypt: IEncrypt, jwtService: IJwtService, emailService: IEmailService, questionnaireResponseRepository: Repository<QuestionnaireResponse>);
+    toggleDeactivate: (id: number) => Promise<ServiceResponse<Professional>>;
     changePassword: (changePasswordDTO: ChangePasswordDTO) => Promise<ServiceResponse<null>>;
     sendForgotPasswordToken: (professionalEmail: string) => Promise<ServiceResponse<{
         token: string;

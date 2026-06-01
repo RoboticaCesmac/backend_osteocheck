@@ -1,6 +1,6 @@
 import app from "./app";
 
-app.listen(3001, (err) => {
+app.listen(3001, (err:any) => {
   if (err) {
     console.log(err);
     return;

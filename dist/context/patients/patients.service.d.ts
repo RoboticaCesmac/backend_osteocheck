@@ -11,6 +11,9 @@ export declare class PatientsService implements IPatientsService {
     private professionalPatientsRepository;
     private dataSource;
     constructor(patientsRepository: Repository<Patient>, professionalPatientsRepository: Repository<ProfessionalPatients>, dataSource: DataSource, professionalService: IProfessionalService);
+    deleteById: (patientId: number) => Promise<ServiceResponse<Patient | null>>;
+    findAll: () => Promise<ServiceResponse<Patient[]>>;
     findById: (patientId: number) => Promise<ServiceResponse<Patient | null>>;
+    private randomUniquePatientIdentifierVerificatorAndGenerator;
     create: (createPatientDTO: CreatePatientDTO) => Promise<ServiceResponse<Patient>>;
 }

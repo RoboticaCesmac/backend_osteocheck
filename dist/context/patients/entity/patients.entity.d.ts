@@ -4,7 +4,7 @@ import { QuestionnaireResponse } from "../../questionnaire/entity/questionnaireR
 export declare class Patient {
     id: number;
     name: string;
-    cpf: string;
+    identifier: string;
     dateOfBirth: Date;
     gender: PatientsGender;
     professionalRelations: ProfessionalPatients[];

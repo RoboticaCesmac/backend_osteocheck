@@ -8,12 +8,6 @@ const patientsGender_enum_1 = require("../enum/patientsGender.enum");
 class ProfessionalRequest {
     create(req) {
         const signupSchema = zod_1.default.object({
-            cpf: zod_1.default
-                .string("É preciso informar o CPF")
-                .transform((v) => v.replace(/\D/g, ""))
-                .refine((v) => v.length === 11, {
-                message: "CPF deve conter 11 dígitos",
-            }),
             dateOfBirth: zod_1.default
                 .coerce.date(),
             gender: zod_1.default

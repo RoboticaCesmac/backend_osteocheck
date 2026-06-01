@@ -11,6 +11,8 @@ const authenticate_middleware_1 = require("../../middleware/authenticate.middlew
 const professionalController = (0, professional_factory_1.createProfessionalController)();
 const router = (0, express_1.Router)();
 router.delete("/professional", (0, authenticate_middleware_1.authMiddleware)(), professionalController.deleteProfessional);
+router.put("/professional/:id/deactivate", (0, authenticate_middleware_1.authMiddleware)(), professionalController.deactivate);
+router.get("/professional/findById/:id", (0, authenticate_middleware_1.authMiddleware)(), professionalController.findById);
 router.put("/professional/change/password", (0, validateRequest_middleware_1.validateRequest)(professional_request_1.default.changePassword), professionalController.changePassword);
 router.put("/professional/send/forgot-password-token", (0, validateRequest_middleware_1.validateRequest)(professional_request_1.default.sendForgotPasswordToken), professionalController.sendForgotPasswordToken);
 router.put("/professional/confirm/forgot-password-token", (0, validateRequest_middleware_1.validateRequest)(professional_request_1.default.confirmForgotPasswordToken), professionalController.confirmForgotPasswordToken);

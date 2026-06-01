@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Professional = void 0;
 const typeorm_1 = require("typeorm");
 const patients_entity_1 = require("../../patients/entity/patients.entity");
+const questionnaireResponse_entity_1 = require("../../questionnaire/entity/questionnaireResponse.entity");
 let Professional = class Professional {
 };
 exports.Professional = Professional;
@@ -64,6 +65,14 @@ __decorate([
     (0, typeorm_1.DeleteDateColumn)(),
     __metadata("design:type", Date)
 ], Professional.prototype, "deletedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Boolean)
+], Professional.prototype, "deactivated", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => questionnaireResponse_entity_1.QuestionnaireResponse, (qr) => qr.professional),
+    __metadata("design:type", Array)
+], Professional.prototype, "questionnaireResponses", void 0);
 exports.Professional = Professional = __decorate([
     (0, typeorm_1.Entity)({
         name: "professionals",

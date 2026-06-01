@@ -12,4 +12,6 @@ const patientsController = (0, patients_factory_1.createPatientsController)();
 const router = (0, express_1.Router)();
 router.post('/patients', (0, authenticate_middleware_1.authMiddleware)(), (0, validateRequest_middleware_1.validateRequest)(patients_request_1.default.create), patientsController.create);
 router.get('/patients/:id', (0, authenticate_middleware_1.authMiddleware)(), patientsController.getById);
+router.get('/patients', (0, authenticate_middleware_1.authMiddleware)(), patientsController.getAll);
+router.delete('/patients/:id', (0, authenticate_middleware_1.authMiddleware)(), patientsController.deleteById);
 exports.default = router;

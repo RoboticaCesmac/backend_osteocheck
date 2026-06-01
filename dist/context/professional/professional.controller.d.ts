@@ -3,6 +3,8 @@ import { IProfessionalService } from './interface/professionalService.interface'
 export declare class ProfessionalController {
     private professionalService;
     constructor(professionalService: IProfessionalService);
+    findById: (req: Request, res: Response) => Promise<Response>;
+    deactivate: (req: Request, res: Response) => Promise<Response>;
     changePassword: (req: Request, res: Response) => Promise<Response>;
     deleteProfessional: (req: Request, res: Response) => Promise<Response>;
     confirmForgotPasswordToken: (req: Request, res: Response) => Promise<Response>;

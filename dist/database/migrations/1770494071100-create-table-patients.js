@@ -20,7 +20,7 @@ class CreateTablePatients1770494071100 {
                     isNullable: false,
                 },
                 {
-                    name: "cpf",
+                    name: "identifier",
                     type: "varchar",
                     isNullable: false,
                     isUnique: true,
@@ -55,8 +55,8 @@ class CreateTablePatients1770494071100 {
             ],
             indices: [
                 {
-                    name: "IDX_PATIENTS_CPF",
-                    columnNames: ["cpf"],
+                    name: "IDX_PATIENTS_IDENTIFIER",
+                    columnNames: ["identifier"],
                 },
                 {
                     name: "IDX_PATIENTS_DELETED_AT",

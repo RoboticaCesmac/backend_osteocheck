@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
-app_1.default.listen(3000, (err) => {
+app_1.default.listen(3001, (err) => {
     if (err) {
         console.log(err);
         return;
     }
-    console.log('Server is running on port 3000');
+    console.log('Server is running on port 3001');
 });

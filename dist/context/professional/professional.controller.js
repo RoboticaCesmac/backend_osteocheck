@@ -3,6 +3,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProfessionalController = void 0;
 class ProfessionalController {
     constructor(professionalService) {
+        this.findById = async (req, res) => {
+            try {
+                const { id } = req.params;
+                const { statusCode, ...response } = await this.professionalService.findById(Number(id));
+                return res.status(statusCode).send(response);
+            }
+            catch (err) {
+                return res.status(err.statusCode || 500).send({ error: err.message });
+            }
+        };
+        this.deactivate = async (req, res) => {
+            try {
+                const { id } = req.params;
+                const { statusCode, ...response } = await this.professionalService.toggleDeactivate(Number(id));
+                return res.status(statusCode).send(response);
+            }
+            catch (err) {
+                return res.status(err.statusCode || 500).send({ error: err.message });
+            }
+        };
         this.changePassword = async (req, res) => {
             try {
                 const { email, password } = req.body;
@@ -18,8 +38,10 @@ class ProfessionalController {
         };
         this.deleteProfessional = async (req, res) => {
             try {
+                const { id } = req.query;
                 const professionalId = req.professional.id;
-                const { statusCode, ...response } = await this.professionalService.deleteProfessional(Number(professionalId));
+                const effectiveProfessionalId = id ?? professionalId;
+                const { statusCode, ...response } = await this.professionalService.deleteProfessional(Number(effectiveProfessionalId));
                 return res.status(statusCode).send(response);
             }
             catch (err) {
@@ -66,6 +88,7 @@ class ProfessionalController {
                 return res.status(statusCode).send(response);
             }
             catch (err) {
+                console.log(err);
                 return res.status(err.statusCode || 500).send({ error: err.message });
             }
         };

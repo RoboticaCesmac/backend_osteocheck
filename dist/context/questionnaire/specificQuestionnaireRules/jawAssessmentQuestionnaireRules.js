@@ -97,8 +97,6 @@ class JawAssessmentQuestionnaireRules {
                     }
                 }
             });
-            console.log('essa é a próxima questão');
-            console.log(nextQuestion);
             if (!nextQuestion) {
                 throw httpResponses_1.HttpResponse.notFound({
                     message: 'Não foi encontrada a próxima questão para essa resposta',

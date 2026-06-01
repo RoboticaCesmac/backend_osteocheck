@@ -7,6 +7,7 @@ function authMiddleware() {
     const jwtService = new jwt_1.JWTService();
     return (req, res, next) => {
         try {
+            console.log(req.headers.authorization);
             const bearerToken = req.headers.authorization;
             const extractedToken = extractBearerToken(bearerToken);
             const professional = jwtService.verify(extractedToken);
@@ -23,13 +24,13 @@ function authMiddleware() {
 function extractBearerToken(token) {
     if (!token) {
         throw httpResponses_1.HttpResponse.unauthorized({
-            message: "JWT Token must be present in this request",
+            message: "JWT Token não fornecido!",
         });
     }
     const splittedToken = token.split("Bearer ");
     if (!splittedToken[1]) {
         throw httpResponses_1.HttpResponse.badRequest({
-            message: "Malformed bearer token",
+            message: "Token malformado!",
         });
     }
     return splittedToken[1];

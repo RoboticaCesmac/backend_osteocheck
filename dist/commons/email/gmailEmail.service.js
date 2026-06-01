@@ -3,28 +3,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-
-const resend_1 = require("resend");
-
+const nodemailer_1 = __importDefault(require("nodemailer"));
 class GmailEmailService {
     constructor() {
-        this.gmailUser = process.env.GMAIL_USER;
-        this.gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
-
-        this.transporter = new resend_1.Resend(this.gmailAppPassword);
+        this.gmailUser = process.env.GMAIL_USER ?? 'emmanuelmedeiros05@gmail.com';
+        this.gmailAppPassword = process.env.GMAIL_APP_PASSWORD ?? '123456';
+        this.transporter = nodemailer_1.default.createTransport({
+            service: 'gmail',
+            auth: {
+                user: this.gmailUser,
+                pass: this.gmailAppPassword,
+            },
+        });
     }
-
     async sendEmail(emailPayload) {
-        const emailAddresses = emailPayload.emailAddress; // não precisa join
-
+        const emailAddresses = emailPayload.emailAddress.join(', ');
         try {
-            await this.transporter.emails.send({
+            await this.transporter.sendMail({
                 from: `"OsteoCheck" <${this.gmailUser}>`,
                 to: emailAddresses,
                 subject: emailPayload.subject,
                 text: emailPayload.text,
             });
-
             console.log('Email sent successfully');
         }
         catch (err) {
@@ -33,5 +33,4 @@ class GmailEmailService {
         }
     }
 }
-
 exports.default = new GmailEmailService();

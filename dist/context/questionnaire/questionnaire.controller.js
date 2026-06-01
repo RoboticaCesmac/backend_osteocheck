@@ -50,8 +50,7 @@ class QuestionnaireController {
                 return res.status(response.statusCode).send(response.data);
             }
             catch (err) {
-                console.log(err);
-                return res.status(err.statusCode || 500).send({ error: err.message });
+                return res.status(err.statusCode || 500).send({ error: 'Erro ao gerar PDF. Verifique se o quesitonário foi finalizado' });
             }
         };
         this.questionnaireService = questionnaireService;

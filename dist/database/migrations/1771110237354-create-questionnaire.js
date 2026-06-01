@@ -110,7 +110,7 @@ class CreateQuestionnaire1771110237354 {
       INSERT INTO questions ("groupId", text, type, "order", "isRequired", "helpText", "createdAt", "updatedAt")
       VALUES (
         ${groups.GROUP_A},
-        'O paciente faz ou fez uso de Drogas Antirreabsortivas (Bisfosfonatos ou Denosumabe) e/ou Drogas Antiangiogênicas?',
+        'O paciente faz ou fez uso de Drogas Antirreabsortivas e/ou Drogas Antiangiogênicas?',
         'singleChoice',
         0,
         true,
@@ -159,7 +159,8 @@ class CreateQuestionnaire1771110237354 {
         (${q2aId}, 'Bisfosfonato Oral', 'bisphosphonate_oral', 0, NOW()),
         (${q2aId}, 'Bisfosfonato Intravenoso', 'bisphosphonate_iv', 1, NOW()),
         (${q2aId}, 'Denosumabe', 'denosumabe', 2, NOW()),
-        (${q2aId}, 'Antiangiogênico', 'antiangiogenic', 3, NOW());
+        (${q2aId}, 'Antiangiogênico', 'antiangiogenic', 3, NOW()),
+        (${q2aId}, 'Romosozumabe', 'romosozumabe', 4, NOW());
     `);
         // Update Q1 "Yes" option to branch to Q2a
         await queryRunner.query(`
@@ -211,7 +212,8 @@ class CreateQuestionnaire1771110237354 {
       VALUES
         (${q2cId}, '< 1 ano', 'less_than_1_year', 0, NOW()),
         (${q2cId}, '1-3 anos', '1_to_3_years', 1, NOW()),
-        (${q2cId}, '> 3 anos', 'more_than_3_years', 2, NOW());
+        (${q2cId}, '> 3 anos', 'more_than_3_years', 2, NOW()),
+        (${q2cId}, 'Não sabe informar', 'do_not_know', 2, NOW());
     `);
         console.log(`✅ Question Q2c (Duration of Use) created (ID: ${q2cId})`);
         // ============================================================
@@ -245,6 +247,12 @@ class CreateQuestionnaire1771110237354 {
             { text: 'Uso de Prótese Mal Adaptada', value: 'ill_fitting_denture' },
             { text: 'História de Procedimentos Odontológicos Invasivos Recentes', value: 'recent_invasive_procedures' },
             { text: 'Xerostomia (induzida por medicamentos)', value: 'xerostomia' },
+            { text: 'Anemia', value: 'anemia' },
+            { text: 'Infecção Odontológica', value: 'odontologic_infeccion' },
+            { text: 'Doses Elevadas da Medicação', value: 'high_medication_dosage' },
+            { text: 'Uso Concomitante de antiangiogênicos e antirreabsortivos', value: 'regular_use_of_antiangiogenics' },
+            { text: 'Tempo Prolongado de uso da medicação', value: 'prolonged_time_of_medication' },
+            { text: 'Ausência de acompanhamento odontológico regular', value: 'absence_of_regular_odontologic_monitoring' },
         ];
         for (let i = 0; i < riskFactors.length; i++) {
             const factor = riskFactors[i];
@@ -344,9 +352,9 @@ class CreateQuestionnaire1771110237354 {
             { text: 'Dor óssea inespecífica na maxila/mandíbula', value: 'nonspecific_bone_pain' },
             { text: 'Parestesia ou anestesia (ex.: "queixo dormente")', value: 'paresthesia_anesthesia' },
             { text: 'Mobilidade dentária inexplicada', value: 'unexplained_tooth_mobility' },
-            { text: 'Falha de cicatrização de alvéolo pós-extração', value: 'socket_healing_failure' },
-            { text: 'Infecção local recorrente, supuração leve e sensibilidade gengival', value: 'recurrent_infection' },
-            { text: 'Edema ou ulceração na mucosa persistente sem causa clara', value: 'mucosal_edema_ulceration' },
+            { text: 'Persistência/falha de cicatrização do alvéolo pós-extração', value: 'socket_healing_failure' },
+            { text: 'Infecção local recorrente, supuração e sensibilidade gengival', value: 'recurrent_infection' },
+            { text: 'Edema ou ulceração persistente da mucosa sem causa aparente', value: 'mucosal_edema_ulceration' },
             { text: 'Supuração ou fístula sem exposição óssea visível', value: 'suppuration_fistula' },
             { text: 'Sinusite persistente ou atípica com envolvimento do seio maxilar', value: 'persistent_sinusitis' },
             { text: 'Alterações Radiológicas Sugestivas (esclerose, espessamento do ligamento periodontal, radiolucências difusas)', value: 'radiological_alterations' },
@@ -427,9 +435,9 @@ class CreateQuestionnaire1771110237354 {
             { text: 'Dor óssea inespecífica na maxila/mandíbula', value: 'h_nonspecific_bone_pain' },
             { text: 'Parestesia ou anestesia (ex.: "queixo dormente")', value: 'h_paresthesia_anesthesia' },
             { text: 'Mobilidade dentária inexplicada', value: 'h_unexplained_tooth_mobility' },
-            { text: 'Falha de cicatrização de alvéolo pós-extração', value: 'h_socket_healing_failure' },
-            { text: 'Infecção local recorrente, supuração leve e sensibilidade gengival', value: 'h_recurrent_infection' },
-            { text: 'Edema ou ulceração na mucosa persistente sem causa clara', value: 'h_mucosal_edema_ulceration' },
+            { text: 'Persistência/falha de cicatrização do alvéolo pós-extração', value: 'h_socket_healing_failure' },
+            { text: 'Infecção local recorrente, supuração e sensibilidade gengival', value: 'h_recurrent_infection' },
+            { text: 'Edema ou ulceração persistente da mucosa sem causa aparente', value: 'h_mucosal_edema_ulceration' },
             { text: 'Supuração ou fístula sem exposição óssea visível', value: 'h_suppuration_fistula' },
             { text: 'Sinusite persistente ou atípica com envolvimento do seio maxilar', value: 'h_persistent_sinusitis' },
             { text: 'Alterações Radiológicas Sugestivas (esclerose, espessamento do ligamento periodontal, radiolucências difusas)', value: 'h_radiological_alterations' },

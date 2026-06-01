@@ -58,8 +58,7 @@ export class QuestionnaireController {
       res.setHeader('Content-Disposition', `attachment; filename=relatorio-${id}.pdf`);
       return res.status(response.statusCode).send(response.data);
     } catch (err: any) {
-      console.log(err);
-      return res.status(err.statusCode || 500).send({ error: err.message });
+      return res.status(err.statusCode || 500).send({ error: 'Erro ao gerar PDF. Verifique se o quesitonário foi finalizado' });
     }
   }
 }

@@ -11,6 +11,19 @@ const signupEmail_const_1 = require("../../const/email/signupEmail.const");
 const forgotPasswordEmail_const_1 = require("../../const/email/forgotPasswordEmail.const");
 class ProfessionalService {
     constructor(professionalRepository, encrypt, jwtService, emailService, questionnaireResponseRepository) {
+        this.toggleDeactivate = async (id) => {
+            const professional = await this.getProfile(id);
+            if (!professional.data) {
+                throw httpResponses_1.HttpResponse.badRequest({
+                    message: 'Profissional não encontrado',
+                });
+            }
+            await this.professionalRepository.update(id, { deactivated: !professional.data.deactivated });
+            return (0, serviceResponse_1.serviceResponse)(httpResponses_1.HttpResponse.success({
+                data: { ...professional.data, deactivated: !professional.data.deactivated },
+                message: 'Profissional ' + (professional.data.deactivated ? 'ativado' : 'desativado') + ' com sucesso!',
+            }));
+        };
         this.changePassword = async (changePasswordDTO) => {
             const professional = await this.findProfessionalByEmail(changePasswordDTO.email);
             if (!professional) {
@@ -63,7 +76,6 @@ class ProfessionalService {
         };
         this.confirmForgotPasswordToken = async (confirmForgotPasswordTokenDTO) => {
             const professional = await this.findProfessionalByEmail(confirmForgotPasswordTokenDTO.email);
-            console.log(professional);
             if (!professional) {
                 throw httpResponses_1.HttpResponse.badRequest({
                     message: 'Esse usuário não existe!',
@@ -119,7 +131,7 @@ class ProfessionalService {
         this.getProfile = async (professionalId) => {
             const professional = await this.professionalRepository.findOne({
                 where: { id: professionalId },
-                select: ['id', 'name', 'email', 'createdAt', 'updatedAt', 'hasConfirmedAccount'],
+                select: ['id', 'name', 'email', 'createdAt', 'updatedAt', 'hasConfirmedAccount', 'deactivated'],
             });
             if (!professional) {
                 throw httpResponses_1.HttpResponse.badRequest({

@@ -16,6 +16,7 @@ const questionnaire_entity_1 = require("./questionnaire.entity");
 const questionnaireResponseAnswer_entity_1 = require("./questionnaireResponseAnswer.entity");
 const questionnaireResult_entity_1 = require("./questionnaireResult.entity");
 const patients_entity_1 = require("../../patients/entity/patients.entity");
+const professional_entity_1 = require("../../professional/entity/professional.entity");
 let QuestionnaireResponse = class QuestionnaireResponse {
 };
 exports.QuestionnaireResponse = QuestionnaireResponse;
@@ -65,6 +66,13 @@ __decorate([
     (0, typeorm_1.JoinColumn)({ name: 'patientId' }),
     __metadata("design:type", patients_entity_1.Patient)
 ], QuestionnaireResponse.prototype, "patient", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => professional_entity_1.Professional, (professional) => professional.questionnaireResponses, {
+        onDelete: 'CASCADE',
+    }),
+    (0, typeorm_1.JoinColumn)({ name: 'professionalId' }),
+    __metadata("design:type", professional_entity_1.Professional)
+], QuestionnaireResponse.prototype, "professional", void 0);
 __decorate([
     (0, typeorm_1.OneToOne)(() => questionnaireResult_entity_1.QuestionnaireResult, (result) => result),
     (0, typeorm_1.JoinColumn)({ name: 'questionnaireResultId' }),

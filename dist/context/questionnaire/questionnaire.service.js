@@ -12,7 +12,6 @@ const responseStatus_enum_1 = require("./enum/responseStatus.enum");
 const dayjs_1 = __importDefault(require("dayjs"));
 const questionnaireResponseAnswer_entity_1 = require("./entity/questionnaireResponseAnswer.entity");
 const pdfkit_1 = __importDefault(require("pdfkit"));
-const professional_entity_1 = require("../professional/entity/professional.entity");
 class QuestionnaireService {
     constructor(patientsService, questionnaireRepository, questionRepository, questionnaireResponseRepository, dataSource, questionnaireRules, questionnaireResultRepository) {
         this.handleFirstQuestion = async (nextQuestionDTO) => {
@@ -303,6 +302,7 @@ class QuestionnaireService {
             const questionnaireResponse = await this.questionnaireResponseRepository.findOne({
                 relations: {
                     patient: true,
+                    professional: true,
                     answers: {
                         question: true,
                         option: true,
@@ -318,14 +318,13 @@ class QuestionnaireService {
                     },
                 },
             });
+            console.log(questionnaireResponse?.patient);
             if (!questionnaireResponse || questionnaireResponse.status !== responseStatus_enum_1.ResponseStatus.COMPLETED) {
                 throw httpResponses_1.HttpResponse.badRequest({
                     message: 'Não é possível visualizar o PDF desse questionário. Ainda não foi finalizado.',
                 });
             }
-            const professional = await this.dataSource.getRepository(professional_entity_1.Professional).findOne({
-                where: { id: generatePdfDTO.professionalId }
-            });
+            const professional = questionnaireResponse.professional;
             if (!professional) {
                 throw httpResponses_1.HttpResponse.notFound({
                     message: 'Profissional não encontrado.',
@@ -348,10 +347,10 @@ class QuestionnaireService {
                 doc.text(`E-mail: ${professional.email}`).moveDown(1);
                 // Patient Info
                 doc.fontSize(14).text('Informações do Paciente', { underline: true }).moveDown(0.5);
-                doc.fontSize(12).text(`Nome: ${questionnaireResponse.patient.name}`);
-                doc.text(`CPF: ${questionnaireResponse.patient.cpf}`);
-                doc.text(`Data de Nascimento: ${(0, dayjs_1.default)(questionnaireResponse.patient.dateOfBirth).format('DD/MM/YYYY')}`);
-                doc.text(`Gênero: ${questionnaireResponse.patient.gender}`).moveDown(1.5);
+                doc.fontSize(12).text(`Nome: ${questionnaireResponse.patient?.name || '--'}`);
+                doc.text(`Identificador: ${questionnaireResponse.patient?.identifier || '--'}`);
+                doc.text(`Data de Nascimento: ${(0, dayjs_1.default)(questionnaireResponse.patient?.dateOfBirth).format('DD/MM/YYYY') || '--'}`);
+                doc.text(`Gênero: ${questionnaireResponse.patient?.gender || '--'}`).moveDown(1.5);
                 // QA
                 doc.fontSize(14).text('Respostas do Questionário', { underline: true }).moveDown(0.5);
                 const questionMap = new Map();
@@ -376,7 +375,7 @@ class QuestionnaireService {
                 });
                 if (questionnaireResponse.result && questionnaireResponse.result.text) {
                     doc.moveDown(1);
-                    doc.fontSize(14).font('Helvetica-Bold').text('Diagnóstico do Questionário', { underline: true }).moveDown(1);
+                    doc.fontSize(14).font('Helvetica-Bold').text('Resultado do Questionário', { underline: true }).moveDown(1);
                     const cleanText = questionnaireResponse.result.text
                         .replace(/\*\*(.*?)\*\*/g, '$1')
                         .replace(/\*(.*?)\*/g, '$1')
@@ -390,7 +389,6 @@ class QuestionnaireService {
                 doc.fontSize(14).font('Helvetica-Bold').text('Considerações Finais', { underline: true }).moveDown(1);
                 doc.fontSize(12).font('Helvetica').text('Disclaimer: O aplicativo é uma ferramenta de apoio e NÃO substitui o julgamento clínico. O diagnóstico e tratamento finais são de responsabilidade do profissional de saúde.');
                 doc.moveDown(0.5);
-                doc.text('Atualizações: O conteúdo será revisado periodicamente para incorporar novas diretrizes e consensos.');
                 doc.end();
             });
             return (0, serviceResponse_1.serviceResponse)(httpResponses_1.HttpResponse.success({
