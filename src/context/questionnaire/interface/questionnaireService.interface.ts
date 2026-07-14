@@ -6,6 +6,7 @@ import { Question } from "../entity/question.entity";
 
 export interface IQuestionnaireService {
   nextQuestion: (nextQuestionDTO: NextQuestionDTO) => Promise<ServiceResponse<Question | null>>;
+  previousQuestion: (questionnaireProgressDTO: QuestionnaireProgressDTO) => Promise<ServiceResponse<Question | null>>;
   getQuestionnaireProgress: (questionnaireProgressDTO: QuestionnaireProgressDTO) => Promise<ServiceResponse<QuestionnaireProgressResponse>>;
   generatePdf: (generatePdfDTO: GeneratePdfDTO) => Promise<ServiceResponse<Buffer>>;
 }

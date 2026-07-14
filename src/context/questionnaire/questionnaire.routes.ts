@@ -8,6 +8,7 @@ const questionnaireController = createQuestionnaireController();
 const router = Router();
 
 router.post('/questionnaire/next-question', authMiddleware(), questionnaireController.nextQuestion);
+router.post('/questionnaire/previous-question', authMiddleware(), questionnaireController.previousQuestion);
 router.get('/questionnaire/progress', authMiddleware(), validateRequest(questionnaireRequest.getQuestionnaireProgress), questionnaireController.getQuestionnaireProgress);
 router.post('/questionnaire/:id/pdf', authMiddleware(), validateRequest(questionnaireRequest.generatePdf), questionnaireController.generatePdf);
 

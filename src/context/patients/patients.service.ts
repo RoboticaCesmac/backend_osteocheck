@@ -57,6 +57,11 @@ export class PatientsService implements IPatientsService {
       where: {
         id: patientId,
       },
+      order: {
+        questionnaireResponses: {
+          createdAt: 'DESC',
+        }
+      }
     });
     return serviceResponse({
       data: patient,

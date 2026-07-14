@@ -274,6 +274,56 @@ export class QuestionnaireService implements IQuestionnaireService {
     return await this.handleNextQuestionInOrder(nextQuestionDTO);
   }
 
+    previousQuestion = async (questionnaireProgressDTO: QuestionnaireProgressDTO): Promise<ServiceResponse<Question | null>> => {
+    const questionnaireResponse = await this.questionnaireResponseRepository.findOne({
+      where: {
+        questionnaire: {
+          type: questionnaireProgressDTO.questionnaireType,
+        },
+        patientId: questionnaireProgressDTO.patientId,
+        professionalId: questionnaireProgressDTO.professionalId,
+      },
+      order: {
+        createdAt: 'DESC',
+      }
+    });
+
+    if (!questionnaireResponse) {
+      throw HttpResponse.badRequest({ message: "Nenhum questionário iniciado." });
+    }
+
+    if (questionnaireResponse.status === ResponseStatus.COMPLETED) {
+      throw HttpResponse.badRequest({ message: "O questionário já foi finalizado e não pode ser alterado." });
+    }
+
+    const lastAnswer = await this.dataSource.getRepository(QuestionResponseAnswer).findOne({
+      where: { responseId: questionnaireResponse.id },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!lastAnswer) {
+      throw HttpResponse.badRequest({ message: "Não há respostas anteriores para remover." });
+    }
+
+    const questionIdToRemove = lastAnswer.questionId;
+
+    await this.dataSource.getRepository(QuestionResponseAnswer).delete({
+      responseId: questionnaireResponse.id,
+      questionId: questionIdToRemove,
+    });
+
+    const question = await this.questionRepository.findOne({
+      relations: {
+        options: true,
+        group: true,
+      },
+      where: { id: questionIdToRemove },
+    });
+
+    return serviceResponse(HttpResponse.success({ data: question }));
+  }
+
+
   findQuestionnaireById = async (questionnaireId: number): Promise<ServiceResponse<Questionnaire | null>> => {
     const questionnaire = await this.questionnaireRepository.findOne({
       where: {

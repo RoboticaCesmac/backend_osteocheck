@@ -27,6 +27,22 @@ export class QuestionnaireController {
     }
   }
 
+  previousQuestion = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const professionalId = req.professional.id;
+      const { patientId, questionnaireType } = req.body;
+      const { statusCode, ...response } = await this.questionnaireService.previousQuestion({
+        patientId: Number(patientId),
+        professionalId,
+        questionnaireType: questionnaireType as QuestionnaireType,
+      });
+      return res.status(statusCode).send(response);
+    } catch (err: any) {
+      console.log(err);
+      return res.status(err.statusCode || 500).send({ error: err.message });
+    }
+  }
+
   getQuestionnaireProgress = async (req: Request, res: Response): Promise<Response> => {
     try {
       const professionalId = req.professional.id;
